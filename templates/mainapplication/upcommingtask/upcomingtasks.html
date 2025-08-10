@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Tasks - Smart Study Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.37);
+            --shadow-hover: 0 15px 35px rgba(31, 38, 135, 0.5);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            padding: 40px 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+
+        .add-task-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .add-task-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            color: white;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .add-btn {
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .tasks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .task-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .task-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .task-subject {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .task-priority {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+
+        .priority-medium {
+            background: linear-gradient(135deg, #feca57, #ff9ff3);
+            color: white;
+        }
+
+        .priority-low {
+            background: linear-gradient(135deg, #48dbfb, #0abde3);
+            color: white;
+        }
+
+        .task-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .task-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+        }
+
+        .task-due {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.85rem;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .edit-btn {
+            background: rgba(74, 144, 226, 0.3);
+            color: #4a90e2;
+        }
+
+        .delete-btn {
+            background: rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+        }
+
+        .complete-btn {
+            background: rgba(46, 204, 113, 0.3);
+            color: #2ecc71;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .add-task-form {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .tasks-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .task-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .task-card:nth-child(1) { animation-delay: 0.1s; }
+        .task-card:nth-child(2) { animation-delay: 0.2s; }
+        .task-card:nth-child(3) { animation-delay: 0.3s; }
+        .task-card:nth-child(4) { animation-delay: 0.4s; }
+        .task-card:nth-child(5) { animation-delay: 0.5s; }
+        .task-card:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i> Smart Study Planner
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {{ name[0].upper() if name else 'U' }}
+                    </div>
+                    <div class="user-name">{{ name }}</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="page-header">
+                <h1 class="page-title">Upcoming Tasks</h1>
+                <p class="page-subtitle">Stay organized and never miss a deadline</p>
+            </section>
+
+            <section class="add-task-section">
+                <form class="add-task-form">
+                    <div class="form-group">
+                        <label class="form-label">Task Title</label>
+                        <input type="text" class="form-input" placeholder="Enter task title">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Due Date</label>
+                        <input type="date" class="form-input">
+                    </div>
+                    <button type="submit" class="add-btn">
+                        <i class="fas fa-plus"></i> Add Task
+                    </button>
+                </form>
+            </section>
+
+            <section class="tasks-grid">
+                <div class="task-card">
+                    <div class="task-header">
+                        <div>
+                            <h3 class="task-title">Complete Physics Assignment</h3>
+                            <div class="task-subject">Physics</div>
+                        </div>
+                        <div class="task-priority priority-high">High</div>
+                    </div>
+                    <p class="task-description">Solve problems from Chapter 12: Thermodynamics and submit the worksheet with detailed solutions.</p>
+                    <div class="task-footer">
+                        <div class="task-due">
+                            <i class="fas fa-calendar-alt"></i>
+                            Due: Tomorrow
+                        </div>
+                        <div class="task-actions">
+                            <button class="action-btn complete-btn"><i class="fas fa-check"></i></button>
+                            <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div>
+                            <h3 class="task-title">Math Quiz Preparation</h3>
+                            <div class="task-subject">Mathematics</div>
+                        </div>
+                        <div class="task-priority priority-medium">Medium</div>
+                    </div>
+                    <p class="task-description">Review calculus concepts including derivatives, integrals, and limits for the upcoming quiz.</p>
+                    <div class="task-footer">
+                        <div class="task-due">
+                            <i class="fas fa-calendar-alt"></i>
+                            Due: In 3 days
+                        </div>
+                        <div class="task-actions">
+                            <button class="action-btn complete-btn"><i class="fas fa-check"></i></button>
+                            <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div>
+                            <h3 class="task-title">History Essay Draft</h3>
+                            <div class="task-subject">History</div>
+                        </div>
+                        <div class="task-priority priority-medium">Medium</div>
+                    </div>
+                    <p class="task-description">Write a 1500-word essay on the Industrial Revolution and its impact on society.</p>
+                    <div class="task-footer">
+                        <div class="task-due">
+                            <i class="fas fa-calendar-alt"></i>
+                            Due: In 5 days
+                        </div>
+                        <div class="task-actions">
+                            <button class="action-btn complete-btn"><i class="fas fa-check"></i></button>
+                            <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div>
+                            <h3 class="task-title">Chemistry Lab Report</h3>
+                            <div class="task-subject">Chemistry</div>
+                        </div>
+                        <div class="task-priority priority-low">Low</div>
+                    </div>
+                    <p class="task-description">Complete the analysis of the titration experiment and write the conclusion section.</p>
+                    <div class="task-footer">
+                        <div class="task-due">
+                            <i class="fas fa-calendar-alt"></i>
+                            Due: Next week
+                        </div>
+                        <div class="task-actions">
+                            <button class="action-btn complete-btn"><i class="fas fa-check"></i></button>
+                            <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div>
+                            <h3 class="task-title">English Literature Review</h3>
+                            <div class="task-subject">English</div>
+                        </div>
+                        <div class="task-priority priority-high">High</div>
+                    </div>
+                    <p class="task-description">Read and analyze Chapters 5-8 of "To Kill a Mockingbird" for class discussion.</p>
+                    <div class="task-footer">
+                        <div class="task-due">
+                            <i class="fas fa-calendar-alt"></i>
+                            Due: In 2 days
+                        </div>
+                        <div class="task-actions">
+                            <button class="action-btn complete-btn"><i class="fas fa-check"></i></button>
+                            <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-header">
+                        <div>
+                            <h3 class="task-title">Biology Project Research</h3>
+                            <div class="task-subject">Biology</div>
+                        </div>
+                        <div class="task-priority priority-low">Low</div>
+                    </div>
+                    <p class="task-description">Gather information about photosynthesis process for the upcoming science fair project.</p>
+                    <div class="task-footer">
+                        <div class="task-due">
+                            <i class="fas fa-calendar-alt"></i>
+                            Due: In 1 week
+                        </div>
+                        <div class="task-actions">
+                            <button class="action-btn complete-btn"><i class="fas fa-check"></i></button>
+                            <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 Smart Study Planner • Made by Sahil Raj Dubey</p>
+        </div>
+    </footer>
+</body>
+</html>

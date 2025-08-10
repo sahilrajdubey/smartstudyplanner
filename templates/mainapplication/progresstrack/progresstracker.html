@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Tracker - Smart Study Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.37);
+            --shadow-hover: 0 15px 35px rgba(31, 38, 135, 0.5);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            padding: 40px 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .stat-icon.study-time { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .stat-icon.completion { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .stat-icon.streak { background: linear-gradient(135deg, #fc466b, #3f5efb); }
+        .stat-icon.average { background: linear-gradient(135deg, #fdbb2d, #22c1c3); }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .chart-title {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .pie-chart {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            position: relative;
+            background: conic-gradient(
+                #667eea 0% 25%,
+                #fc466b 25% 45%,
+                #11998e 45% 70%,
+                #fdbb2d 70% 85%,
+                #f093fb 85% 95%,
+                #4facfe 95% 100%
+            );
+        }
+
+        .pie-chart::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .bar-chart {
+            height: 200px;
+            display: flex;
+            align-items: end;
+            justify-content: space-around;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(180deg, var(--accent-gradient));
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: all 0.3s ease;
+            min-height: 20px;
+        }
+
+        .bar:hover {
+            transform: scale(1.05);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .weekly-progress {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .weekly-title {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
+        }
+
+        .day-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .day-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .day-card.completed {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .day-name {
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .day-progress {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .days-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card, .chart-card, .weekly-progress {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i> Smart Study Planner
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {{ name[0].upper() if name else 'U' }}
+                    </div>
+                    <div class="user-name">{{ name }}</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="page-header">
+                <h1 class="page-title">Progress Tracker</h1>
+                <p class="page-subtitle">Monitor your learning journey and academic achievements</p>
+            </section>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon study-time">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-number">24.5h</div>
+                    <div class="stat-label">Study Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon completion">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-number">89%</div>
+                    <div class="stat-label">Completion Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon streak">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Day Streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon average">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-number">92%</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+            </section>
+
+            <section class="charts-section">
+                <div class="chart-card">
+                    <h3 class="chart-title">Subject Distribution</h3>
+                    <div class="pie-chart"></div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #667eea;"></div>
+                            <span>Mathematics (25%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #fc466b;"></div>
+                            <span>Physics (20%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #11998e;"></div>
+                            <span>Chemistry (25%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #fdbb2d;"></div>
+                            <span>Biology (15%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #f093fb;"></div>
+                            <span>English (10%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4facfe;"></div>
+                            <span>History (5%)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3 class="chart-title">Weekly Performance</h3>
+                    <div class="bar-chart">
+                        <div class="bar" style="height: 80%;">
+                            <div class="bar-value">85%</div>
+                            <div class="bar-label">Mon</div>
+                        </div>
+                        <div class="bar" style="height: 95%;">
+                            <div class="bar-value">92%</div>
+                            <div class="bar-label">Tue</div>
+                        </div>
+                        <div class="bar" style="height: 75%;">
+                            <div class="bar-value">78%</div>
+                            <div class="bar-label">Wed</div>
+                        </div>
+                        <div class="bar" style="height: 90%;">
+                            <div class="bar-value">88%</div>
+                            <div class="bar-label">Thu</div>
+                        </div>
+                        <div class="bar" style="height: 100%;">
+                            <div class="bar-value">95%</div>
+                            <div class="bar-label">Fri</div>
+                        </div>
+                        <div class="bar" style="height: 60%;">
+                            <div class="bar-value">68%</div>
+                            <div class="bar-label">Sat</div>
+                        </div>
+                        <div class="bar" style="height: 85%;">
+                            <div class="bar-value">82%</div>
+                            <div class="bar-label">Sun</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="weekly-progress">
+                <h3 class="weekly-title">Weekly Study Goals</h3>
+                <div class="days-grid">
+                    <div class="day-card completed">
+                        <div class="day-name">Mon</div>
+                        <div class="day-progress">100%</div>
+                    </div>
+                    <div class="day-card completed">
+                        <div class="day-name">Tue</div>
+                        <div class="day-progress">100%</div>
+                    </div>
+                    <div class="day-card completed">
+                        <div class="day-name">Wed</div>
+                        <div class="day-progress">100%</div>
+                    </div>
+                    <div class="day-card completed">
+                        <div class="day-name">Thu</div>
+                        <div class="day-progress">100%</div>
+                    </div>
+                    <div class="day-card completed">
+                        <div class="day-name">Fri</div>
+                        <div class="day-progress">100%</div>
+                    </div>
+                    <div class="day-card">
+                        <div class="day-name">Sat</div>
+                        <div class="day-progress">75%</div>
+                    </div>
+                    <div class="day-card">
+                        <div class="day-name">Sun</div>
+                        <div class="day-progress">0%</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 Smart Study Planner • Made by Sahil Raj Dubey</p>
+        </div>
+    </footer>
+</body>
+</html>

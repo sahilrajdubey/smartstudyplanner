@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completed Topics - Smart Study Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.37);
+            --shadow-hover: 0 15px 35px rgba(31, 38, 135, 0.5);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            padding: 40px 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+
+        .progress-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .progress-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .progress-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .progress-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .overall-progress {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .progress-title {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .progress-bar-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            height: 20px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+            border-radius: 25px;
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            color: white;
+            font-weight: 500;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .subject-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .subject-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .subject-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .subject-icon.math { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .subject-icon.physics { background: linear-gradient(135deg, #fc466b, #3f5efb); }
+        .subject-icon.chemistry { background: linear-gradient(135deg, #fdbb2d, #22c1c3); }
+        .subject-icon.biology { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .subject-icon.english { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .subject-icon.history { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+
+        .subject-info h3 {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .subject-stats {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .topics-list {
+            list-style: none;
+        }
+
+        .topic-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .topic-item:last-child {
+            border-bottom: none;
+        }
+
+        .topic-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding-left: 8px;
+        }
+
+        .topic-check {
+            color: #2ecc71;
+            font-size: 1.2rem;
+        }
+
+        .topic-name {
+            color: white;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .topic-date {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .progress-overview {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subject-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .subject-card:nth-child(1) { animation-delay: 0.1s; }
+        .subject-card:nth-child(2) { animation-delay: 0.2s; }
+        .subject-card:nth-child(3) { animation-delay: 0.3s; }
+        .subject-card:nth-child(4) { animation-delay: 0.4s; }
+        .subject-card:nth-child(5) { animation-delay: 0.5s; }
+        .subject-card:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i> Smart Study Planner
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {{ name[0].upper() if name else 'U' }}
+                    </div>
+                    <div class="user-name">{{ name }}</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="page-header">
+                <h1 class="page-title">Completed Topics</h1>
+                <p class="page-subtitle">Track your learning achievements and celebrate your progress</p>
+            </section>
+
+            <section class="progress-overview">
+                <div class="progress-card">
+                    <div class="progress-number">47</div>
+                    <div class="progress-label">Topics Completed</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-number">6</div>
+                    <div class="progress-label">Subjects</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-number">89%</div>
+                    <div class="progress-label">Overall Progress</div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-number">12</div>
+                    <div class="progress-label">Days Streak</div>
+                </div>
+            </section>
+
+            <section class="overall-progress">
+                <h2 class="progress-title">Overall Learning Progress</h2>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: 89%;"></div>
+                </div>
+                <div class="progress-text">89% of curriculum completed</div>
+            </section>
+
+            <section class="subjects-grid">
+                <div class="subject-card">
+                    <div class="subject-header">
+                        <div class="subject-icon math">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <div class="subject-info">
+                            <h3>Mathematics</h3>
+                            <div class="subject-stats">12 topics completed • 95% progress</div>
+                        </div>
+                    </div>
+                    <ul class="topics-list">
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Differential Calculus</span>
+                            <span class="topic-date">2 days ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Integral Calculus</span>
+                            <span class="topic-date">5 days ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Limits and Continuity</span>
+                            <span class="topic-date">1 week ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Linear Algebra</span>
+                            <span class="topic-date">1 week ago</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="subject-card">
+                    <div class="subject-header">
+                        <div class="subject-icon physics">
+                            <i class="fas fa-atom"></i>
+                        </div>
+                        <div class="subject-info">
+                            <h3>Physics</h3>
+                            <div class="subject-stats">8 topics completed • 80% progress</div>
+                        </div>
+                    </div>
+                    <ul class="topics-list">
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Thermodynamics</span>
+                            <span class="topic-date">1 day ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Electromagnetism</span>
+                            <span class="topic-date">3 days ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Mechanics</span>
+                            <span class="topic-date">1 week ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Wave Motion</span>
+                            <span class="topic-date">2 weeks ago</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="subject-card">
+                    <div class="subject-header">
+                        <div class="subject-icon chemistry">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <div class="subject-info">
+                            <h3>Chemistry</h3>
+                            <div class="subject-stats">10 topics completed • 85% progress</div>
+                        </div>
+                    </div>
+                    <ul class="topics-list">
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Organic Chemistry</span>
+                            <span class="topic-date">2 days ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Acid-Base Reactions</span>
+                            <span class="topic-date">4 days ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Chemical Bonding</span>
+                            <span class="topic-date">1 week ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Periodic Table</span>
+                            <span class="topic-date">2 weeks ago</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="subject-card">
+                    <div class="subject-header">
+                        <div class="subject-icon biology">
+                            <i class="fas fa-dna"></i>
+                        </div>
+                        <div class="subject-info">
+                            <h3>Biology</h3>
+                            <div class="subject-stats">9 topics completed • 90% progress</div>
+                        </div>
+                    </div>
+                    <ul class="topics-list">
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Cell Biology</span>
+                            <span class="topic-date">1 day ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Genetics</span>
+                            <span class="topic-date">3 days ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Photosynthesis</span>
+                            <span class="topic-date">5 days ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Evolution</span>
+                            <span class="topic-date">1 week ago</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="subject-card">
+                    <div class="subject-header">
+                        <div class="subject-icon english">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="subject-info">
+                            <h3>English Literature</h3>
+                            <div class="subject-stats">6 topics completed • 75% progress</div>
+                        </div>
+                    </div>
+                    <ul class="topics-list">
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Shakespeare Analysis</span>
+                            <span class="topic-date">2 days ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Poetry Techniques</span>
+                            <span class="topic-date">1 week ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Essay Writing</span>
+                            <span class="topic-date">1 week ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Novel Analysis</span>
+                            <span class="topic-date">2 weeks ago</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="subject-card">
+                    <div class="subject-header">
+                        <div class="subject-icon history">
+                            <i class="fas fa-landmark"></i>
+                        </div>
+                        <div class="subject-info">
+                            <h3>History</h3>
+                            <div class="subject-stats">5 topics completed • 70% progress</div>
+                        </div>
+                    </div>
+                    <ul class="topics-list">
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">World War II</span>
+                            <span class="topic-date">3 days ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Industrial Revolution</span>
+                            <span class="topic-date">1 week ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Ancient Civilizations</span>
+                            <span class="topic-date">2 weeks ago</span>
+                        </li>
+                        <li class="topic-item">
+                            <i class="fas fa-check-circle topic-check"></i>
+                            <span class="topic-name">Renaissance Period</span>
+                            <span class="topic-date">3 weeks ago</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 Smart Study Planner • Made by Sahil Raj Dubey</p>
+        </div>
+    </footer>
+</body>
+</html>
